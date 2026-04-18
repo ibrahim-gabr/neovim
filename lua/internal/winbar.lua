@@ -4,6 +4,26 @@ local function isempty(s)
   return s == nil or s == ""
 end
 
+local function sanitize_hl_suffix(value)
+  local suffix = tostring(value or "")
+  if isempty(suffix) then
+    return "default"
+  end
+
+  return suffix:gsub("[^%w_-]", "_")
+end
+
+local function get_file_icon_hl_group(extension, file_icon_color)
+  if isempty(file_icon_color) then
+    return "Winbar"
+  end
+
+  local hl_group = "FileIconColor_" .. sanitize_hl_suffix(extension)
+  vim.api.nvim_set_hl(0, hl_group, { fg = file_icon_color })
+
+  return hl_group
+end
+
 M.filename = function()
   local filename = vim.fn.expand("%:t")
   local file_path = vim.fn.expand("%:p")
@@ -27,13 +47,12 @@ M.filename = function()
     file_icon, file_icon_color =
         require("nvim-web-devicons").get_icon_color(filename, extension, { default = default })
 
-    local hl_group = "FileIconColor" .. extension
-
-    vim.api.nvim_set_hl(0, hl_group, { fg = file_icon_color })
     if file_icon == nil then
       file_icon = default_file_icon
       file_icon_color = default_file_icon_color
     end
+
+    local hl_group = get_file_icon_hl_group(extension, file_icon_color)
 
     -- Return filename if parent dir doesn't exist
     if (parent_dir == nil or parent_dir == '') then

@@ -17,7 +17,13 @@ return {
   {
     "iamcco/markdown-preview.nvim",
     cmd = { "MarkdownPreviewToggle", "MarkdownPreview", "MarkdownPreviewStop" },
-    build = "cd app && pnpm install",
+    build = function(plugin)
+      local package = vim.json.decode(table.concat(vim.fn.readfile(plugin.dir .. "/package.json"), "\n"))
+      vim.fn.system({ plugin.dir .. "/app/install.sh", "v" .. package.version })
+      if vim.v.shell_error ~= 0 then
+        error("markdown-preview.nvim build failed")
+      end
+    end,
     init = function()
       vim.g.mkdp_filetypes = { "markdown" }
     end,
