@@ -1,5 +1,8 @@
-spell
-.DS_Store
-snippets
-lua/config/user.lua
-/AGENTS.md
+tt.*
+.tests
+doc/tags
+debug
+.repro
+foo.*
+*.log
+data
